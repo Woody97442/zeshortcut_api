@@ -11,7 +11,12 @@ export default class extends BaseSchema {
       table.float('protein').nullable()
       table.float('lipid').nullable()
       table.float('carbohydrate').nullable()
-      table.string('type_category').notNullable()
+      table.string('portion').notNullable()
+      table.string('label_portion').nullable()
+      table.string('type_category').nullable()
+      table.string('type_product').nullable()
+      table.json('composing').nullable()
+
     })
   }
 

@@ -1,6 +1,7 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 
 export default class Product extends BaseModel {
+  [x: string]: any
   @column({ isPrimary: true })
   declare id: number
 
@@ -18,5 +19,17 @@ export default class Product extends BaseModel {
 
   @column()
   declare type_category: string
+
+  @column()
+  declare portion: number
+
+  @column()
+  declare label_portion: string
+
+  @column()
+  declare type_product: string
+
+  @column()
+  declare composing: string[]
 
 }
