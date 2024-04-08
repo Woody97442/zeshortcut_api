@@ -7,10 +7,10 @@ export default class MealsController {
   async getkalPerDay({ request, response }: HttpContext) {
 
     try {
-      const sex: number = request.input("sex");
-      const age: number = request.input("age");
-      const weight: number = request.input("weight");
-      const size: number = request.input("size");
+      const sex: number = parseInt(request.input("sex"));
+      const age: number = parseInt(request.input("age"));
+      const weight: number = parseInt(request.input("weight"));
+      const size: number = parseInt(request.input("size"));
 
       if (sex === undefined || !age || !weight || !size) {
         return response.badRequest({ message: "Missing parameters" });
@@ -33,8 +33,8 @@ export default class MealsController {
   }
   async generateMeals({ request, response }: HttpContext) {
 
-    let BMR: number = request.input("BMR");
-    const typePlan: number = request.input("typePlan"); // add = 0 / remove = 1
+    let BMR: number = parseInt(request.input("BMR"));
+    const typePlan: number = parseInt(request.input("typePlan")); // add = 0 / remove = 1
     const userMail: string = request.input("userMail");
 
     typePlan === 0 ? BMR = BMR + 250 : BMR = BMR - 250;
