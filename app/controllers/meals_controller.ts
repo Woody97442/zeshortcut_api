@@ -1,6 +1,7 @@
 
 import Product from "#models/product"
 import { HttpContext } from "@adonisjs/core/http"
+import nodemailer from 'nodemailer';
 
 export default class MealsController {
 
@@ -57,18 +58,9 @@ export default class MealsController {
       return acc;
     }, {});
 
-    var data = {
-      service_id: 'service_4m131ed',
-      template_id: 'template_2x14ysm',
-      user_id: 'pZV0QI4FINKtyyVSS',
-      template_params: {
-        'to_mail': userMail,
-        'to_bmr': BMR,
-        'message': formatMealsForHtml(mealsGenerated)
-      }
-    };
+    sendMail(userMail, formatMealsForHtml(mealsGenerated, userMail, BMR))
 
-    return response.ok(data);
+    return response.ok("ok");
   }
 }
 
@@ -141,20 +133,67 @@ function selectProduct(productList: Product[], gramNutrient: number, typeCategor
   return randomProduct;
 }
 
-function formatMealsForHtml(meals: any) {
+function formatMealsForHtml(meals: any, userMail: string, BMR: number) {
 
-  var htmlMeals: string = "";
+  var htmlMeals: string = ""
+
+  htmlMeals += `<p style = "text-align: center;" > <img src="cid:logo" alt="logo ZeShortCut"> </p>`
+  htmlMeals += `<p style = "text-align: center;" > Bonjour ${userMail}, </p>`
+  htmlMeals += `<p style = "text-align: center;" > Merci d'avoir choisie notre platforme</p>`
+  htmlMeals += `<p style = "text-align: center;" > Votre nombre de kcal par jour est de: ${BMR} Kcal/j </p>`
+  htmlMeals += `<p style = "text-align: center;" > Voici votre Plan de régime alimentaire personnalisé : </p><br/>`
+
 
   for (let index = 0; index < Object.keys(meals).length; index++) {
     var htmlMeal: string = "";
     const meal: any = Object.values(meals)[index];
-    htmlMeal += `<h3>${meal.label}</h3> <br/>`
-    htmlMeal += `<p>${meal.Appetizer.label} : ${meal.Appetizer.portion} ${meal.Appetizer.unit}</p><br/>`
-    htmlMeal += `<p>${meal.main_course.label} : ${meal.main_course.portion} ${meal.main_course.unit}</p><br/>`
-    htmlMeal += `<p>${meal.dessert.label} : ${meal.dessert.portion} ${meal.dessert.unit}</p><br/>`
+    htmlMeal += `<h3 style = "text-align: center;">${meal.label}</h3>`
+    htmlMeal += `<p style = "text-align: center;">${meal.Appetizer.label} : ${meal.Appetizer.portion} ${meal.Appetizer.unit}</p>`
+    htmlMeal += `<p style = "text-align: center;">${meal.main_course.label} : ${meal.main_course.portion} ${meal.main_course.unit}</p>`
+    htmlMeal += `<p style = "text-align: center;">${meal.dessert.label} : ${meal.dessert.portion} ${meal.dessert.unit}</p>`
 
     htmlMeals += htmlMeal;
   }
 
   return htmlMeals;
+}
+
+
+function sendMail(userMail: string, html: string) {
+
+  // Créer un transporteur SMTP réutilisable
+  let transporter = nodemailer.createTransport({
+    host: 'smtp-mail.outlook.com',
+    port: 587,
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: 'zeshortcut.974@outlook.fr',
+      pass: 'CDA97419'
+    },
+    tls: {
+      ciphers: 'SSLv3'
+    }
+  });
+
+  // Paramètres de l'e-mail
+  let mailOptions = {
+    from: 'zeshortcut.974@outlook.fr',
+    to: userMail,
+    subject: 'Votre Plan personnalisé et prêt',
+    html: html,
+    attachments: [{
+      filename: 'logo.png',
+      path: 'public/images/logo.png',
+      cid: 'logo' // id de l'image dans le contenu HTML de l'e-mail
+    }]
+  };
+
+  // Envoyer l'e-mail
+  transporter.sendMail(mailOptions, function (error: any, info: { response: string; }) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email envoyé: ' + info.response);
+    }
+  });
 }
