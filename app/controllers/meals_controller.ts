@@ -64,7 +64,7 @@ export default class MealsController {
       template_params: {
         'to_mail': userMail,
         'to_bmr': BMR,
-        'message': mealsGenerated
+        'message': formatMealsForHtml(mealsGenerated)
       }
     };
 
@@ -139,4 +139,22 @@ function selectProduct(productList: Product[], gramNutrient: number, typeCategor
   const randomIndex: number = Math.floor(Math.random() * chosenProducts.length);
   const randomProduct: ProductWithMultiplier = chosenProducts[randomIndex];
   return randomProduct;
+}
+
+function formatMealsForHtml(meals: any) {
+
+  var htmlMeals: string = "";
+
+  for (let index = 0; index < Object.keys(meals).length; index++) {
+    var htmlMeal: string = "";
+    const meal: any = Object.values(meals)[index];
+    htmlMeal += `<h3>${meal.label}</h3> <br/>`
+    htmlMeal += `<p>${meal.Appetizer.label} : ${meal.Appetizer.portion} ${meal.Appetizer.unit}</p><br/>`
+    htmlMeal += `<p>${meal.main_course.label} : ${meal.main_course.portion} ${meal.main_course.unit}</p><br/>`
+    htmlMeal += `<p>${meal.dessert.label} : ${meal.dessert.portion} ${meal.dessert.unit}</p><br/>`
+
+    htmlMeals += htmlMeal;
+  }
+
+  return htmlMeals;
 }
